@@ -1,5 +1,11 @@
 import { AuthContextProps, DecodedTokenProps, UserProps } from "@/types";
-import { createContext, ReactNode, useContext, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
@@ -20,6 +26,43 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const router = useRouter();
 
+  const loadToken = async () => {
+    const storedToken = await AsyncStorage.getItem("token");
+    if (storedToken) {
+      try {
+        const decodedToken = jwtDecode<DecodedTokenProps>(storedToken);
+        if (decodedToken.exp && decodedToken.exp < Date.now() / 1000) {
+          // token expired
+          await AsyncStorage.removeItem("token");
+          goToWelcomePage();
+          return;
+        }
+
+        // user is authenticated
+        setToken(storedToken);
+        setUser(decodedToken.user);
+
+        goToHomePage();
+      } catch (error) {
+        goToWelcomePage();
+      }
+    } else {
+      goToWelcomePage();
+    }
+  };
+
+  useEffect(() => {
+    loadToken();
+  }, []);
+
+  const goToHomePage = () => {
+    router.replace("/(main)/home" as any);
+  };
+
+  const goToWelcomePage = () => {
+    router.replace("/(auth)/welcome" as any);
+  };
+
   const updateToken = async (token: string) => {
     if (token) {
       setToken(token);
@@ -27,7 +70,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // decode the token
       const decodedToken = jwtDecode<DecodedTokenProps>(token);
-      console.log("decodedToken: ", decodedToken);
       setUser(decodedToken.user);
     }
   };

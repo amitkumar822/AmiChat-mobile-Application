@@ -1,16 +1,9 @@
-import { StatusBar, StyleSheet, Text, View } from "react-native";
+import { StatusBar, StyleSheet, View } from "react-native";
 import React from "react";
 import { colors } from "@/constants/theme";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { router } from "expo-router";
-import { useEffect } from "react";
 
 const SplashScreen = () => {
-  useEffect(() => {
-    setTimeout(() => {
-      router.replace("/(auth)/welcome");
-    }, 1500);
-  }, []);
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={colors.neutral900} />
