@@ -8,12 +8,10 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
   try {
     if (!email || !password || !name) {
-      res
-        .status(400)
-        .json({
-          success: false,
-          message: "Email, password and name are required",
-        });
+      res.status(400).json({
+        success: false,
+        message: "Email, password and name are required",
+      });
       return;
     }
     const user = await User.findOne({ email });

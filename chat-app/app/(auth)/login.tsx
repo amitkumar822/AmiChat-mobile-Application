@@ -19,6 +19,7 @@ import * as Icons from "phosphor-react-native";
 import { verticalScale } from "@/utils/styling";
 import { useRouter } from "expo-router";
 import Button from "@/controllers/Button";
+import { useAuth } from "@/contexts/authContext";
 
 const LoginScreen = () => {
   const router = useRouter();
@@ -26,11 +27,20 @@ const LoginScreen = () => {
   const emailRef = useRef("");
   const passwordRef = useRef("");
 
-  const [isLoading, setisLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { signIn } = useAuth();
   const handleSubmit = async () => {
     if (emailRef.current === "" || passwordRef.current === "") {
       Alert.alert("Error", "Please fill all fields");
       return;
+    }
+    setIsLoading(true);
+    try {
+      await signIn(emailRef.current, passwordRef.current);
+    } catch (error: any) {
+        Alert.alert("Error", error?.message);
+      } finally {
+      setIsLoading(false);
     }
   };
 

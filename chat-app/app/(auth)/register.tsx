@@ -19,6 +19,7 @@ import * as Icons from "phosphor-react-native";
 import { verticalScale } from "@/utils/styling";
 import { useRouter } from "expo-router";
 import Button from "@/controllers/Button";
+import { useAuth } from "@/contexts/authContext";
 
 const RegisterScreen = () => {
   const router = useRouter();
@@ -28,16 +29,31 @@ const RegisterScreen = () => {
   const passwordRef = useRef("");
   const confirmPasswordRef = useRef("");
 
-  const [isLoading, setisLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { signUp } = useAuth();
 
   const handleSubmit = async () => {
-    if (nameRef.current === "" || emailRef.current === "" || passwordRef.current === "" || confirmPasswordRef.current === "") {
+    if (
+      nameRef.current === "" ||
+      emailRef.current === "" ||
+      passwordRef.current === "" ||
+      confirmPasswordRef.current === ""
+    ) {
       Alert.alert("Error", "Please fill all fields");
       return;
     }
     if (passwordRef.current !== confirmPasswordRef.current) {
       Alert.alert("Error", "Passwords do not match");
       return;
+    }
+    setIsLoading(true);
+    try {
+      await signUp(emailRef.current, passwordRef.current, nameRef.current);
+    } catch (error) {
+      console.error("Error signing up:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -61,7 +77,6 @@ const RegisterScreen = () => {
             <ScrollView
               contentContainerStyle={styles.form}
               showsVerticalScrollIndicator={false}
-
             >
               <View style={{ gap: spacingY._10, marginTop: spacingY._15 }}>
                 <Typo size={28} fontWeight="600">

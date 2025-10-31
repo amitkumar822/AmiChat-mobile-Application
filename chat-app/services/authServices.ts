@@ -15,7 +15,6 @@ export const register = async (
     });
     return response.data;
   } catch (error: any) {
-    console.error("Error registering:", error);
     const errorMessage =
       error.response?.data?.message || "An unknown error occurred";
     throw new Error(errorMessage);
@@ -33,7 +32,6 @@ export const login = async (
     });
     return response.data;
   } catch (error: any) {
-    console.error("Error logging in:", error);
     const errorMessage =
       error.response?.data?.message || "An unknown error occurred";
     throw new Error(errorMessage);

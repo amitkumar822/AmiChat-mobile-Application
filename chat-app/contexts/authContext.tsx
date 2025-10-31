@@ -8,7 +8,7 @@ import { login, register } from "@/services/authServices";
 export const AuthContext = createContext<AuthContextProps>({
   token: null,
   user: null,
-  signIn: async () => {},
+  signIn: async () => ({ token: "" }),
   signUp: async () => {},
   signOut: async () => {},
   updateToken: async () => {},
@@ -36,6 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const response = await login(email, password);
     await updateToken(response.token);
     router.replace("/(main)/home" as any);
+    return { token: response.token };
   };
 
   const signUp = async (

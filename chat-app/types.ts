@@ -49,7 +49,7 @@ export interface DecodedTokenProps {
 export type AuthContextProps = {
   token: string | null;
   user: UserProps | null;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<{ token: string }>;
   signUp: (
     email: string,
     password: string,
