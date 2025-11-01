@@ -8,7 +8,7 @@ export const register = async (
   avatar?: string
 ): Promise<{ token: string }> => {
   try {
-    const response = await axios.post(`${API_URL}/auth/register`, {
+    const response = await axios.post(`${API_URL}/api/auth/register`, {
       email,
       password,
       name,
@@ -26,7 +26,7 @@ export const login = async (
   password: string
 ): Promise<{ token: string }> => {
   try {
-    const response = await axios.post(`${API_URL}/auth/login`, {
+    const response = await axios.post(`${API_URL}/api/auth/login`, {
       email,
       password,
     });

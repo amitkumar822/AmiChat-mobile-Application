@@ -38,6 +38,7 @@ const LoginScreen = () => {
     try {
       await signIn(emailRef.current, passwordRef.current);
     } catch (error: any) {
+      console.log(error);
         Alert.alert("Error", error?.message);
       } finally {
       setIsLoading(false);

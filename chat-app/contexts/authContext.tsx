@@ -10,6 +10,7 @@ import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
 import { login, register } from "@/services/authServices";
+import { connectSocket, disconnectSocket } from "@/socket/socket";
 
 export const AuthContext = createContext<AuthContextProps>({
   token: null,
@@ -40,6 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         // user is authenticated
         setToken(storedToken);
+        await connectSocket();
         setUser(decodedToken.user);
 
         goToHomePage();
@@ -77,6 +79,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signIn = async (email: string, password: string) => {
     const response = await login(email, password);
     await updateToken(response.token);
+    await connectSocket();
     router.replace("/(main)/home" as any);
     return { token: response.token };
   };
@@ -89,6 +92,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   ) => {
     const response = await register(email, password, name, avatar);
     await updateToken(response.token);
+    await connectSocket();
     router.replace("/(main)/home" as any);
   };
 
@@ -96,6 +100,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setToken(null);
     setUser(null);
     await AsyncStorage.removeItem("token");
+    disconnectSocket();
     router.replace("/(auth)/welcome" as any);
   };
 
