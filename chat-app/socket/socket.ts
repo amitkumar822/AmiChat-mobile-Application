@@ -5,16 +5,14 @@ import { io, Socket } from "socket.io-client";
 let socket: Socket | null = null;
 
 export async function connectSocket(): Promise<Socket> {
-  const token = AsyncStorage.getItem("token");
+  const token = await AsyncStorage.getItem("token");
   if (!token) {
     throw new Error("No token found");
   }
 
   if (!socket) {
     socket = io(API_URL, {
-      auth: {
-        auth: { token },
-      },
+      auth: { token },
     });
 
     // wait for connection
