@@ -1,24 +1,22 @@
 import {
   StyleSheet,
-  Text,
   View,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  TextInput,
   TouchableOpacity,
   Alert,
 } from "react-native";
 import React, { useRef, useState } from "react";
-import ScreenWrapper from "@/controllers/ScreenWrapper";
-import Typo from "@/controllers/Typo";
+import ScreenWrapper from "@/components/ScreenWrapper";
+import Typo from "@/components/Typo";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
-import BackButton from "@/controllers/BackButton";
-import Input from "@/controllers/Input";
+import BackButton from "@/components/BackButton";
+import Input from "@/components/Input";
 import * as Icons from "phosphor-react-native";
 import { verticalScale } from "@/utils/styling";
 import { useRouter } from "expo-router";
-import Button from "@/controllers/Button";
+import Button from "@/components/Button";
 import { useAuth } from "@/contexts/authContext";
 
 const LoginScreen = () => {

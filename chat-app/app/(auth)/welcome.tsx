@@ -1,10 +1,10 @@
 import { colors, spacingX, spacingY } from "@/constants/theme";
-import ScreenWrapper from "@/controllers/ScreenWrapper";
-import Typo from "@/controllers/Typo";
+import ScreenWrapper from "@/components/ScreenWrapper";
+import Typo from "@/components/Typo";
 import { verticalScale } from "@/utils/styling";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import Button from "@/controllers/Button";
+import Button from "@/components/Button";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { useRouter } from "expo-router";
 
