@@ -12,6 +12,7 @@ import { router } from "expo-router";
 
 const Home = () => {
   const { user: currentUser, signOut } = useAuth();
+  // console.log("currentUser:====>", currentUser?.avatar);
 
   // useEffect(() => {
   //   testSocket(testSocketCallbackHandler);
@@ -34,7 +35,6 @@ const Home = () => {
     router.push("/(main)/profileModal");
   };
 
-  
   return (
     <ScreenWrapper showPattern={true} bgOpacity={0.4}>
       <View style={styles.container}>
@@ -61,7 +61,7 @@ const Home = () => {
             />
           </TouchableOpacity>
         </View>
-        
+
         <View style={styles.content}></View>
       </View>
     </ScreenWrapper>

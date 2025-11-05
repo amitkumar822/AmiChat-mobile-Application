@@ -3,12 +3,11 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { colors, radius, spacingX, spacingY } from "@/constants/theme";
+import { colors, spacingX, spacingY } from "@/constants/theme";
 import { scale, verticalScale } from "@/utils/styling";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import Header from "@/components/Header";
@@ -21,15 +20,37 @@ import Typo from "@/components/Typo";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
 import { router } from "expo-router";
+import { updateProfile } from "@/socket/socketEvents";
+import * as ImagePicker from "expo-image-picker";
+import { uploadFileToCloudinary } from "@/services/imageService";
 
 const ProfileModal = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, updateToken } = useAuth();
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState<UserDataProps>({
     name: "",
     email: "",
     avatar: null,
   });
+
+  useEffect(() => {
+    updateProfile(processUpdateProfile);
+
+    return () => {
+      updateProfile(processUpdateProfile, true);
+    };
+  }, []);
+
+  const processUpdateProfile = (res: any) => {
+    setLoading(false);
+
+    if (res.success) {
+      updateToken(res.data.token);
+      router.back();
+    } else {
+      Alert.alert("User", res.msg || "Failed to update profile");
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -40,6 +61,21 @@ const ProfileModal = () => {
       });
     }
   }, [user]);
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      // allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.5,
+    });
+
+
+    if (!result.canceled) {
+      setUserData({ ...userData, avatar: result?.assets?.[0] });
+    }
+  };
 
   const showLogoutAlert = () => {
     Alert.alert("Confirm", "Are you sure you want to logout?", [
@@ -57,13 +93,32 @@ const ProfileModal = () => {
     await signOut();
   };
 
-  const handleSubmit = () => {
+
+  const handleSubmit = async () => {
     const { name, avatar } = userData;
     if (!name.trim()) {
       Alert.alert("Username is required", "Please enter your username");
       return;
     }
-    
+
+    let data = {
+      name,
+      avatar,
+    };
+
+    if (avatar && avatar?.uri) {
+      setLoading(true);
+      const res = await uploadFileToCloudinary(avatar, "profile");
+      if (res.success) {
+        data.avatar = res.data;
+      } else {
+        Alert.alert("User", res.msg || "Failed to update profile");
+        setLoading(false);
+        return;
+      }
+    }
+
+    updateProfile(data);
   };
 
   return (
@@ -80,9 +135,9 @@ const ProfileModal = () => {
         {/* Form */}
         <ScrollView contentContainerStyle={styles.form}>
           <View style={styles.avatarContainer}>
-            <Avatar uri={null} size={170} />
+            <Avatar uri={userData.avatar || null} size={170} />
 
-            <TouchableOpacity style={styles.editIcon} onPress={() => {}}>
+            <TouchableOpacity style={styles.editIcon} onPress={pickImage}>
               <Icons.PencilIcon
                 size={verticalScale(20)}
                 color={colors.neutral800}
@@ -119,7 +174,7 @@ const ProfileModal = () => {
                 onChangeText={(text) =>
                   setUserData({ ...userData, name: text })
                 }
-                // editable={false}
+              // editable={false}
               />
             </View>
           </View>
