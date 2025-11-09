@@ -1,16 +1,34 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
-import { colors, spacingY } from '@/constants/theme'
-import { ConversationListItemProps } from '@/types'
-import Avatar from './Avatar'
-import moment from 'moment'
-import Typo from './Typo'
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React from "react";
+import { colors, spacingY } from "@/constants/theme";
+import { ConversationListItemProps } from "@/types";
+import Avatar from "./Avatar";
+import moment from "moment";
+import Typo from "./Typo";
+import { useAuth } from "@/contexts/authContext";
 
-const ConversationItem = ({ item, showDivider, router }: ConversationListItemProps) => {
-    const openConversation = () => { }
+const ConversationItem = ({
+    item,
+    showDivider,
+    router,
+}: ConversationListItemProps) => {
+
+    console.log("item: ", JSON.stringify(item, null, 2));
+
+    const { user: currentUser } = useAuth();
 
     const lastMessage: any = item.lastMessage;
     const isDirect = item.type === "direct";
+    let avatar = item?.avatar;
+    const otherParticipant = isDirect
+        ? item.participants.find(
+            (participant: any) => participant._id !== currentUser?.id
+        )
+        : null;
+
+    if (isDirect && otherParticipant) {
+        avatar = otherParticipant?.avatar;
+    }
 
     const getLastMessageDate = () => {
         if (!lastMessage?.createdAt) return null;
@@ -27,30 +45,48 @@ const ConversationItem = ({ item, showDivider, router }: ConversationListItemPro
         }
 
         return messageDate.format("MMM D, YYYY");
-    }
+    };
 
     const getLastMessageContent = () => {
         if (!lastMessage) return "Say hi 👋";
 
         return lastMessage?.attachement ? "Image" : lastMessage?.content;
-    }
+    };
+
+
+    const openConversation = () => {
+        router.push({
+            pathname: "/(main)/conversation",
+            params: {
+                id: item._id,
+                name: item.name,
+                avatar: item.avatar,
+                type: item.type,
+                participants: JSON.stringify(item.participants),
+            },
+        });
+    };
 
     return (
         <View>
-            <TouchableOpacity onPress={openConversation}
+            <TouchableOpacity
+                onPress={openConversation}
                 style={styles.conversationItem}
             >
                 <View>
-                    <Avatar uri={null} size={47} isGroup={item.type === "group"} />
+                    <Avatar uri={avatar} size={47} isGroup={item.type === "group"} />
                 </View>
 
                 <View style={{ flex: 1 }}>
                     <View style={styles.row}>
-                        <Typo size={17} fontWeight={"600"}>{item?.name}</Typo>
-                        {item?.lastMessage && <Typo size={15} >{getLastMessageDate()}</Typo>}
+                        <Typo size={17} fontWeight={"600"}>
+                            {isDirect ? otherParticipant?.name : item?.name}
+                        </Typo>
+                        {item?.lastMessage && <Typo size={15}>{getLastMessageDate()}</Typo>}
                     </View>
 
-                    <Typo size={15}
+                    <Typo
+                        size={15}
                         color={colors.neutral600}
                         textProps={{ numberOfLines: 1 }}
                     >
@@ -61,10 +97,10 @@ const ConversationItem = ({ item, showDivider, router }: ConversationListItemPro
 
             {showDivider && <View style={styles.divider} />}
         </View>
-    )
-}
+    );
+};
 
-export default ConversationItem
+export default ConversationItem;
 
 const styles = StyleSheet.create({
     conversationItem: {
@@ -83,5 +119,5 @@ const styles = StyleSheet.create({
         width: "95%",
         alignSelf: "center",
         backgroundColor: "rgba(0, 0, 0, 0.07)",
-    }
-})
+    },
+});
