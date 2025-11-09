@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import ScreenWrapper from "@/components/ScreenWrapper";
@@ -20,6 +20,7 @@ import Typo from "@/components/Typo";
 import { useAuth } from "@/contexts/authContext";
 import Button from "@/components/Button";
 import { verticalScale } from "@/utils/styling";
+import { getContacts } from "@/socket/socketEvents";
 
 const NewCovnersationModal = () => {
   const { isGroup } = useLocalSearchParams();
@@ -32,8 +33,24 @@ const NewCovnersationModal = () => {
     []
   );
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [contacts, setContacts] = useState<any[]>([]);
 
   const { user: currentUser } = useAuth();
+
+  useEffect(() => {
+    getContacts(processGetContacts);
+    getContacts(null);
+
+    return () => {
+      getContacts(processGetContacts, false);
+    }
+  }, []);
+
+  const processGetContacts = (res: any) => {
+    if (res.success) {
+      setContacts(res.data);
+    }
+  }
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -48,59 +65,6 @@ const NewCovnersationModal = () => {
       setGroupAvatar(result?.assets?.[0]);
     }
   };
-
-  const contacts = [
-    {
-      id: "1",
-      name: "John Doe",
-      avatar: "https://randomuser.me/api/portraits/men/45.jpg",
-    },
-    {
-      id: "2",
-      name: "Jane Doe",
-      avatar: "https://randomuser.me/api/portraits/women/65.jpg",
-    },
-    {
-      id: "3",
-      name: "Jim Doe",
-      avatar: "https://randomuser.me/api/portraits/men/12.jpg",
-    },
-    {
-      id: "4",
-      name: "Jill Doe",
-      avatar: "https://randomuser.me/api/portraits/women/31.jpg",
-    },
-    {
-      id: "5",
-      name: "Jack Doe",
-      avatar: "https://randomuser.me/api/portraits/men/72.jpg",
-    },
-    {
-      id: "6",
-      name: "Jill Doe",
-      avatar: "https://randomuser.me/api/portraits/women/52.jpg",
-    },
-    {
-      id: "7",
-      name: "Jack Doe",
-      avatar: "https://randomuser.me/api/portraits/men/68.jpg",
-    },
-    {
-      id: "8",
-      name: "Jill Doe",
-      avatar: "https://randomuser.me/api/portraits/women/74.jpg",
-    },
-    {
-      id: "9",
-      name: "Jack Doe",
-      avatar: "https://randomuser.me/api/portraits/men/34.jpg",
-    },
-    {
-      id: "10",
-      name: "Jill Doe",
-      avatar: "https://randomuser.me/api/portraits/women/28.jpg",
-    },
-  ];
 
   const toggleParticipant = (user: any) => {
     setSelectedParticipants((prev: any) => {
