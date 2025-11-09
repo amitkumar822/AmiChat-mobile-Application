@@ -54,7 +54,7 @@ const NewCovnersationModal = () => {
     }
   };
   const processNewConversation = (res: any) => {
-    console.log("new conversation response: ", JSON.stringify(res, null, 2));
+    // console.log("new conversation response: ", JSON.stringify(res, null, 2));
     setIsLoading(false);
     if (res.success) {
       router.back();
@@ -69,7 +69,7 @@ const NewCovnersationModal = () => {
         },
       });
     } else {
-      console.log("Error fetching/creating conversation: ", res.msg);
+      // console.log("Error fetching/creating conversation: ", res.msg);
       Alert.alert("Error", res.msg);
     }
   };
