@@ -12,9 +12,6 @@ const ConversationItem = ({
     showDivider,
     router,
 }: ConversationListItemProps) => {
-
-    console.log("item: ", JSON.stringify(item, null, 2));
-
     const { user: currentUser } = useAuth();
 
     const lastMessage: any = item.lastMessage;
