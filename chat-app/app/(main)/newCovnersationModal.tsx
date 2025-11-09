@@ -20,11 +20,10 @@ import Typo from "@/components/Typo";
 import { useAuth } from "@/contexts/authContext";
 import Button from "@/components/Button";
 import { verticalScale } from "@/utils/styling";
-import { getContacts } from "@/socket/socketEvents";
+import { getContacts, newConversation } from "@/socket/socketEvents";
 
 const NewCovnersationModal = () => {
   const { isGroup } = useLocalSearchParams();
-  console.log("isGroup: ", isGroup);
   const isGroupMode = isGroup === "1";
   const router = useRouter();
   const [groupAvatar, setGroupAvatar] = useState<{ uri: string } | null>(null);
@@ -39,10 +38,12 @@ const NewCovnersationModal = () => {
 
   useEffect(() => {
     getContacts(processGetContacts);
+    newConversation(processNewConversation);
     getContacts(null);
 
     return () => {
       getContacts(processGetContacts, false);
+      newConversation(processNewConversation, false);
     }
   }, []);
 
@@ -50,6 +51,9 @@ const NewCovnersationModal = () => {
     if (res.success) {
       setContacts(res.data);
     }
+  }
+  const processNewConversation = (res: any) => {
+    console.log("new conversation response: ", res);
   }
 
   const pickImage = async () => {
@@ -76,6 +80,7 @@ const NewCovnersationModal = () => {
   };
 
   const onSelectUser = (user: any) => {
+    console.log("onSelectUser: ", user);
     if (!currentUser) {
       Alert.alert("Authentication Required", "Please login to continue");
       return;
@@ -84,12 +89,15 @@ const NewCovnersationModal = () => {
     if (isGroupMode) {
       toggleParticipant(user);
     } else {
-      // TODO: Implement direct conversation creation
+      newConversation({
+        type: "direct",
+        participants: [currentUser.id, user.id],
+      });
     }
   };
 
   const createGroup = async () => {
-    if(!groupName.trim() || selectedParticipants.length < 2 || !currentUser) return;
+    if (!groupName.trim() || selectedParticipants.length < 2 || !currentUser) return;
 
     // TODO: Implement group creation
   }
@@ -154,13 +162,13 @@ const NewCovnersationModal = () => {
         </ScrollView>
 
         {
-            isGroupMode && selectedParticipants.length >= 2 && (
-                <View style={styles.createGroupButton}>
-                    <Button onPress={createGroup} loading={isLoading} disabled={!groupName.trim()}>
-                        <Typo size={17} fontWeight={"bold"}>Create Group</Typo>
-                    </Button>
-                </View>
-            )
+          isGroupMode && selectedParticipants.length >= 2 && (
+            <View style={styles.createGroupButton}>
+              <Button onPress={createGroup} loading={isLoading} disabled={!groupName.trim()}>
+                <Typo size={17} fontWeight={"bold"}>Create Group</Typo>
+              </Button>
+            </View>
+          )
         }
       </View>
     </ScreenWrapper>
@@ -223,6 +231,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderTopWidth: 1,
     borderTopColor: colors.neutral200,
-    
+
   },
 });

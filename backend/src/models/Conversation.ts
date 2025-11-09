@@ -34,10 +34,10 @@ const ConversationSchema = new Schema<ConversationProps>(
     //   type: Date,
     //   default: Date.now,
     // },
-    // createdBy: {
-    //   type: Date,
-    //   default: Date.now,
-    // },
+    createdBy: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
     timestamps: true,

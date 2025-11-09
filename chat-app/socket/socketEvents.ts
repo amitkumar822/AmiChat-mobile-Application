@@ -56,3 +56,22 @@ export const getContacts = (playoad: any, off: boolean = false) => {
     socket.emit("getContacts", playoad); // sending payload as data
   }
 };
+
+export const newConversation = (playoad: any, off: boolean = false) => {
+  const socket = getSocket();
+  if (!socket) {
+    console.log("Socket not connected");
+    return;
+  }
+
+  if (off) {
+    // turn off listing to this event
+    socket.off("newConversation", playoad); // payload is the callback
+  } else if (typeof playoad === "function") {
+    // turn on listing to this event
+    socket.on("newConversation", playoad); // payload as callback for this event
+  } else {
+    // turn on listing to this event
+    socket.emit("newConversation", playoad); // sending payload as data
+  }
+};
