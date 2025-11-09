@@ -1,5 +1,5 @@
-import { StyleSheet, TouchableOpacity, View } from "react-native";
-import React, { useEffect } from "react";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import Typo from "@/components/Typo";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
@@ -9,10 +9,13 @@ import { testSocket } from "@/socket/socketEvents";
 import * as Icons from "phosphor-react-native";
 import { verticalScale } from "@/utils/styling";
 import { router } from "expo-router";
+import ConversationItem from "@/components/ConversationItem";
+import Loading from "@/components/Loading";
 
 const Home = () => {
   const { user: currentUser, signOut } = useAuth();
-  // console.log("currentUser:====>", currentUser?.avatar);
+  const [selectedTab, setSelectedTab] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   // useEffect(() => {
   //   testSocket(testSocketCallbackHandler);
@@ -34,6 +37,187 @@ const Home = () => {
   const handleSettings = () => {
     router.push("/(main)/profileModal");
   };
+
+  const conversations = [
+    {
+      name: "Priya Sharma",
+      type: "direct",
+      lastMessage: {
+        senderName: "Priya Sharma",
+        content: "Kya aap kal meeting ke liye available ho?",
+        createdAt: "2023-01-15T14:30:00Z",
+      },
+    },
+    {
+      name: "Rahul Gupta",
+      type: "direct",
+      lastMessage: {
+        senderName: "Rahul Gupta",
+        content: "Project ka status kya hai?",
+        createdAt: "2024-01-15T12:15:00Z",
+      },
+    },
+    {
+      name: "Family Group",
+      type: "group",
+      lastMessage: {
+        senderName: "Anita Singh",
+        content: "Diwali ki planning karte hain sab",
+        createdAt: "2025-01-15T10:45:00Z",
+      },
+    },
+    {
+      name: "Amit Kumar",
+      type: "direct",
+      lastMessage: {
+        senderName: "Amit Kumar",
+        content: "Code review kar lo please",
+        createdAt: "2025-01-15T09:20:00Z",
+      },
+    },
+    {
+      name: "Neha Patel",
+      type: "direct",
+      lastMessage: {
+        senderName: "Neha Patel",
+        content: "Lunch karne chaloge?",
+        createdAt: "2025-01-14T18:00:00Z",
+      },
+    },
+    {
+      name: "Office Team",
+      type: "group",
+      lastMessage: {
+        senderName: "Vikram Mehta",
+        content: "Standup meeting 10 AM mein",
+        createdAt: "2025-01-14T16:30:00Z",
+      },
+    },
+    {
+      name: "Sneha Reddy",
+      type: "direct",
+      lastMessage: {
+        senderName: "Sneha Reddy",
+        content: "Documents bhej diye hain, check karo",
+        createdAt: "2025-01-14T14:20:00Z",
+      },
+    },
+    {
+      name: "Arjun Singh",
+      type: "direct",
+      lastMessage: {
+        senderName: "Arjun Singh",
+        content: "Weekend plan kya hai?",
+        createdAt: "2025-01-14T11:10:00Z",
+      },
+    },
+    {
+      name: "Kavya Iyer",
+      type: "direct",
+      lastMessage: {
+        senderName: "Kavya Iyer",
+        content: "Presentation ready hai",
+        createdAt: "2025-01-13T20:45:00Z",
+      },
+    },
+    {
+      name: "College Friends",
+      type: "group",
+      lastMessage: {
+        senderName: "Rohan Desai",
+        content: "Reunion ki date fix karte hain",
+        createdAt: "2025-01-13T19:30:00Z",
+      },
+    },
+    {
+      name: "Manish Joshi",
+      type: "direct",
+      lastMessage: {
+        senderName: "Manish Joshi",
+        content: "Bug fix kar diya hai",
+        createdAt: "2025-01-13T17:15:00Z",
+      },
+    },
+    {
+      name: "Divya Nair",
+      type: "direct",
+      lastMessage: {
+        senderName: "Divya Nair",
+        content: "Meeting notes share karungi",
+        createdAt: "2025-01-13T15:00:00Z",
+      },
+    },
+    {
+      name: "Rohit Verma",
+      type: "direct",
+      lastMessage: {
+        senderName: "Rohit Verma",
+        content: "Client ka response aaya hai",
+        createdAt: "2025-01-12T13:45:00Z",
+      },
+    },
+    {
+      name: "Ananya Rao",
+      type: "direct",
+      lastMessage: {
+        senderName: "Ananya Rao",
+        content: "Design mockups ready hain",
+        createdAt: "2025-01-12T11:30:00Z",
+      },
+    },
+    {
+      name: "Tech Team",
+      type: "group",
+      lastMessage: {
+        senderName: "Aditya Shah",
+        content: "Deployment successful ho gaya",
+        createdAt: "2025-01-12T09:20:00Z",
+      },
+    },
+    {
+      name: "Riya Agarwal",
+      type: "direct",
+      lastMessage: {
+        senderName: "Riya Agarwal",
+        content: "Kal offline meeting hai",
+        createdAt: "2025-01-11T18:00:00Z",
+      },
+    },
+    {
+      name: "Vishal Malhotra",
+      type: "direct",
+      lastMessage: {
+        senderName: "Vishal Malhotra",
+        content: "API documentation update karni hai",
+        createdAt: "2025-01-11T16:30:00Z",
+      },
+    },
+    {
+      name: "Shreya Das",
+      type: "direct",
+      lastMessage: {
+        senderName: "Shreya Das",
+        content: "Test cases pass ho rahe hain",
+        createdAt: "2025-01-11T14:15:00Z",
+      },
+    },
+  ];
+
+  let directConversations = conversations
+    .filter((item: any) => item.type === "direct")
+    .sort((a: any, b: any) => {
+      const aDate = a?.lastMessage?.createdAt || a.createdAt;
+      const bDate = b?.lastMessage?.createdAt || b.createdAt;
+      return new Date(bDate).getTime() - new Date(aDate).getTime();
+    });
+
+  let groupConversations = conversations
+    .filter((item: any) => item.type === "group")
+    .sort((a: any, b: any) => {
+      const aDate = a?.lastMessage?.createdAt || a.createdAt;
+      const bDate = b?.lastMessage?.createdAt || b.createdAt;
+      return new Date(bDate).getTime() - new Date(aDate).getTime();
+    });
 
   return (
     <ScreenWrapper showPattern={true} bgOpacity={0.4}>
@@ -62,8 +246,92 @@ const Home = () => {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.content}></View>
+        <View style={styles.content}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingVertical: spacingY._20 }}
+          >
+            <View style={styles.navBar}>
+              <View style={styles.tabs}>
+                <TouchableOpacity
+                  style={[
+                    styles.tabStyle,
+                    selectedTab === 0 && styles.activeTabStyle,
+                  ]}
+                  onPress={() => setSelectedTab(0)}
+                >
+                  <Typo>Direct Messages</Typo>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.tabStyle,
+                    selectedTab === 1 && styles.activeTabStyle,
+                  ]}
+                  onPress={() => setSelectedTab(1)}
+                >
+                  <Typo>Groups</Typo>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.converstionList}>
+              {selectedTab == 0 &&
+                directConversations.map((item: any, index: number) => {
+                  return (
+                    <ConversationItem
+                      item={item}
+                      key={index}
+                      router={router}
+                      showDivider={index !== directConversations.length - 1}
+                    />
+                  );
+                })}
+              {selectedTab == 1 &&
+                groupConversations.map((item: any, index: number) => {
+                  return (
+                    <ConversationItem
+                      item={item}
+                      key={index}
+                      router={router}
+                      showDivider={index !== groupConversations.length - 1}
+                    />
+                  );
+                })}
+            </View>
+
+            {!loading &&
+              selectedTab == 0 &&
+              directConversations.length == 0 && (
+                <Typo style={{ textAlign: "center" }}>
+                  You don't have any messages
+                </Typo>
+              )}
+            {!loading && selectedTab == 1 && groupConversations.length == 0 && (
+              <Typo style={{ textAlign: "center" }}>
+                You haven't joined any groups yet
+              </Typo>
+            )}
+
+            {loading && <Loading />}
+          </ScrollView>
+        </View>
       </View>
+
+      <Button
+        style={styles.floatingButton}
+        onPress={() => router.push({
+          pathname: "/(main)/newCovnersationModal",
+          params: {
+            isGroup: selectedTab
+          },
+        })}
+      >
+        <Icons.PlusIcon
+          size={verticalScale(24)}
+          weight="bold"
+          color={colors.black}
+        />
+      </Button>
     </ScreenWrapper>
   );
 };
