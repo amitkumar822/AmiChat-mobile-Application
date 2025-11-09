@@ -21,6 +21,7 @@ import { useAuth } from "@/contexts/authContext";
 import Button from "@/components/Button";
 import { verticalScale } from "@/utils/styling";
 import { getContacts, newConversation } from "@/socket/socketEvents";
+import { uploadFileToCloudinary } from "@/services/imageService";
 
 const NewCovnersationModal = () => {
   const { isGroup } = useLocalSearchParams();
@@ -44,23 +45,40 @@ const NewCovnersationModal = () => {
     return () => {
       getContacts(processGetContacts, false);
       newConversation(processNewConversation, false);
-    }
+    };
   }, []);
 
   const processGetContacts = (res: any) => {
     if (res.success) {
       setContacts(res.data);
     }
-  }
+  };
   const processNewConversation = (res: any) => {
-    console.log("new conversation response: ", res);
-  }
+    console.log("new conversation response: ", JSON.stringify(res, null, 2));
+    setIsLoading(false);
+    if (res.success) {
+      router.back();
+      router.push({
+        pathname: "/(main)/conversation",
+        params: {
+          id: res.data._id,
+          name: res.data.name,
+          avatar: res.data.avatar,
+          type: res.data.type,
+          participants: JSON.stringify(res.data.participants),
+        },
+      });
+    } else {
+      console.log("Error fetching/creating conversation: ", res.msg);
+      Alert.alert("Error", res.msg);
+    }
+  };
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
-      allowsEditing: true,
+      // allowsEditing: true,
       aspect: [4, 3],
       quality: 0.5,
     });
@@ -80,7 +98,7 @@ const NewCovnersationModal = () => {
   };
 
   const onSelectUser = (user: any) => {
-    console.log("onSelectUser: ", user);
+    // console.log("onSelectUser: ", user);
     if (!currentUser) {
       Alert.alert("Authentication Required", "Please login to continue");
       return;
@@ -97,10 +115,38 @@ const NewCovnersationModal = () => {
   };
 
   const createGroup = async () => {
-    if (!groupName.trim() || selectedParticipants.length < 2 || !currentUser) return;
+    if (!groupName.trim() || selectedParticipants.length < 2 || !currentUser || !groupAvatar) {
+      Alert.alert("Group Creation", "Group name is required, at least 2 participants are required and a group avatar is required");
+      return;
+    }
 
-    // TODO: Implement group creation
-  }
+    setIsLoading(true);
+    try {
+      let avatar = null;
+      if (groupAvatar) {
+        const uploadResult = await uploadFileToCloudinary(
+          groupAvatar,
+          "group-avatars"
+        );
+
+        if (uploadResult.success) {
+          avatar = uploadResult.data;
+        }
+
+        newConversation({
+          type: "group",
+          participants: [currentUser.id, ...selectedParticipants],
+          name: groupName,
+          avatar,
+        });
+      }
+    } catch (error: any) {
+      console.error("Error creating group: ", error);
+      Alert.alert("Error", error.message || "Failed to create group");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <ScreenWrapper isModal={true}>
@@ -142,7 +188,8 @@ const NewCovnersationModal = () => {
               <TouchableOpacity
                 key={index}
                 style={[
-                  styles.contactRow, isSelected && styles.selectedContact,
+                  styles.contactRow,
+                  isSelected && styles.selectedContact,
                 ]}
                 onPress={() => onSelectUser(user)}
               >
@@ -161,15 +208,19 @@ const NewCovnersationModal = () => {
           })}
         </ScrollView>
 
-        {
-          isGroupMode && selectedParticipants.length >= 2 && (
-            <View style={styles.createGroupButton}>
-              <Button onPress={createGroup} loading={isLoading} disabled={!groupName.trim()}>
-                <Typo size={17} fontWeight={"bold"}>Create Group</Typo>
-              </Button>
-            </View>
-          )
-        }
+        {isGroupMode && selectedParticipants.length >= 2 && (
+          <View style={styles.createGroupButton}>
+            <Button
+              onPress={createGroup}
+              loading={isLoading}
+              disabled={!groupName.trim()}
+            >
+              <Typo size={17} fontWeight={"bold"}>
+                Create Group
+              </Typo>
+            </Button>
+          </View>
+        )}
       </View>
     </ScreenWrapper>
   );
@@ -231,6 +282,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderTopWidth: 1,
     borderTopColor: colors.neutral200,
-
   },
 });
