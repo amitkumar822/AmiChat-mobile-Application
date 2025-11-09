@@ -94,3 +94,41 @@ export const getConversations = (playoad: any, off: boolean = false) => {
     socket.emit("getConversations", playoad); // sending payload as data
   }
 };
+
+export const newMessage = (playoad: any, off: boolean = false) => {
+  const socket = getSocket();
+  if (!socket) {
+    console.log("Socket not connected");
+    return;
+  }
+
+  if (off) {
+    // turn off listing to this event
+    socket.off("newMessage", playoad); // payload is the callback
+  } else if (typeof playoad === "function") {
+    // turn on listing to this event
+    socket.on("newMessage", playoad); // payload as callback for this event
+  } else {
+    // turn on listing to this event
+    socket.emit("newMessage", playoad); // sending payload as data
+  }
+};
+
+export const getMessage = (playoad: any, off: boolean = false) => {
+  const socket = getSocket();
+  if (!socket) {
+    console.log("Socket not connected");
+    return;
+  }
+
+  if (off) {
+    // turn off listing to this event
+    socket.off("getMessage", playoad); // payload is the callback
+  } else if (typeof playoad === "function") {
+    // turn on listing to this event
+    socket.on("getMessage", playoad); // payload as callback for this event
+  } else {
+    // turn on listing to this event
+    socket.emit("getMessage", playoad); // sending payload as data
+  }
+};

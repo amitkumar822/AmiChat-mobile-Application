@@ -1,11 +1,13 @@
 import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useMemo } from "react";
 import { MessageProps } from "@/types";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { verticalScale } from "@/utils/styling";
 import { useAuth } from "@/contexts/authContext";
 import Avatar from "./Avatar";
 import Typo from "./Typo";
+import moment from "moment";
+import { Image } from "expo-image";
 
 const MessageItem = ({
     item,
@@ -15,7 +17,12 @@ const MessageItem = ({
     isDirect: boolean;
 }) => {
     const { user: currentUser } = useAuth();
-    const isMe = item.isMe;
+    const isMe = currentUser?.id === item.sender.id;
+
+    const formattedDate = useMemo(() => {
+        const date = moment(item.createdAt).isSame(moment(), "day") ? moment(item.createdAt).format("h:mm A") : moment(item.createdAt).format("MMM D, h:mm A");
+        return date;
+    }, [item.createdAt]);
 
     return (
         <View
@@ -25,7 +32,7 @@ const MessageItem = ({
             ]}
         >
             {!isMe && !isDirect && (
-                <Avatar uri={null} size={30} style={styles.messageAvatar} />
+                <Avatar uri={item?.sender?.avatar} size={30} style={styles.messageAvatar} />
             )}
 
             <View
@@ -40,6 +47,15 @@ const MessageItem = ({
                     </Typo>
                 )}
 
+                {!!item.attachment && (
+                    <Image
+                        source={{ uri: item.attachment }}
+                        style={styles.attachment}
+                        contentFit="cover"
+                        transition={100}
+                    /> 
+                )}
+
                 {item.content && <Typo size={15}>{item.content}</Typo>}
 
                 <Typo
@@ -47,7 +63,7 @@ const MessageItem = ({
                     size={11}
                     color={colors.neutral600}
                 >
-                    {item.createdAt}
+                    {formattedDate}
                 </Typo>
             </View>
         </View>

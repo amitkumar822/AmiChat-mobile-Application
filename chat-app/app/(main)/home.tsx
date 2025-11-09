@@ -5,7 +5,7 @@ import Typo from "@/components/Typo";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import Button from "@/components/Button";
 import { useAuth } from "@/contexts/authContext";
-import { getConversations, newConversation, testSocket } from "@/socket/socketEvents";
+import { getConversations, newConversation, newMessage, testSocket } from "@/socket/socketEvents";
 import * as Icons from "phosphor-react-native";
 import { verticalScale } from "@/utils/styling";
 import { router } from "expo-router";
@@ -22,18 +22,20 @@ const Home = () => {
   useEffect(() => {
     getConversations(processConversations);
     newConversation(newConversationHandler);
+    newMessage(newMessageHandler);
 
     getConversations(null);
 
     return () => {
       getConversations(processConversations, true);
       newConversation(newConversationHandler, true);
+      newMessage(newMessageHandler, true);
     };
   }, []);
 
   const processConversations = (res: ResponseProps) => {
     // console.log("conversations response: ", JSON.stringify(res, null, 2));
-    
+
     if (res.success) {
       setConversations(res.data);
     }
@@ -44,6 +46,22 @@ const Home = () => {
       setConversations((prev) => [...prev, res.data]);
     }
   };
+
+  const newMessageHandler = (res: ResponseProps) => {
+    if (res.success) {
+      let conversationId = res.data.conversationId;
+
+      setConversations((prev) => {
+        let updatedConversations = prev.map((item) => {
+          if (item._id === conversationId) {
+            item.lastMessage = res.data;
+          }
+          return item;
+        });
+        return updatedConversations;
+      })
+    }
+  }
 
   // useEffect(() => {
   //   testSocket(testSocketCallbackHandler);
