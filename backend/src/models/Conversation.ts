@@ -35,8 +35,9 @@ const ConversationSchema = new Schema<ConversationProps>(
     //   default: Date.now,
     // },
     createdBy: {
-      type: Date,
-      default: Date.now,
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
   },
   {

@@ -12,15 +12,15 @@ export function registerChatEvent(io: SocketIOServer, socket: Socket) {
           type: "direct",
           participants: { $all: data.participants, $size: 2 },
         })
-          .populate("participants", "name avatar email")
+          .populate({path: "participants", select: "name avatar email"})
           .lean();
 
         if (existingConversation) {
           socket.emit("newConversation", {
             success: true,
             data: { ...existingConversation, isNew: false },
-            msg: "Conversation already exists",
           });
+          return;
         }
       }
 
@@ -56,11 +56,9 @@ export function registerChatEvent(io: SocketIOServer, socket: Socket) {
 
         // emit conversation to all participants in the conversation
         io.to(conversation._id.toString()).emit("newConversation", {
-            success: true,
-            data: {...populatedConversation, isNew: true},
-            msg: "Conversation created successfully",
+          success: true,
+          data: { ...populatedConversation, isNew: true },
         });
-        // TODO: i am add return
         return;
     } catch (error) {
       console.error("Error creating conversation: ", error);
