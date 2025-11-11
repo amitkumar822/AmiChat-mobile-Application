@@ -2,6 +2,7 @@ import { Socket, Server as SocketIOServer } from "socket.io";
 import User from "../models/User";
 import { generateToken } from "../utils/token";
 
+//userEvents
 export function registerUserEvents(_io: SocketIOServer, socket: Socket) {
   // when user connects, register events
   // socket.on("testSocket", (_data) => {

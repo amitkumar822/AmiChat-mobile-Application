@@ -6,6 +6,7 @@ import { registerUserEvents } from "./userEvents";
 import { registerChatEvent } from "./chatEvent";
 import Conversation from "../models/Conversation";
 
+//socket
 export function initializeSocket(server: any): SocketIOServer {
   const io = new SocketIOServer(server, {
     cors: {

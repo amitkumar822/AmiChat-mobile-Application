@@ -3,7 +3,7 @@ import { getSocket } from "./socket";
 export const testSocket = (playoad: any, off: boolean = false) => {
   const socket = getSocket();
   if (!socket) {
-    console.log("Socket not connected");
+    // console.log("Socket not connected");
     return;
   }
 
@@ -22,7 +22,7 @@ export const testSocket = (playoad: any, off: boolean = false) => {
 export const updateProfile = (playoad: any, off: boolean = false) => {
   const socket = getSocket();
   if (!socket) {
-    console.log("Socket not connected");
+    // console.log("Socket not connected");
     return;
   }
 
@@ -41,7 +41,7 @@ export const updateProfile = (playoad: any, off: boolean = false) => {
 export const getContacts = (playoad: any, off: boolean = false) => {
   const socket = getSocket();
   if (!socket) {
-    console.log("Socket not connected");
+    // console.log("Socket not connected");
     return;
   }
 
@@ -60,7 +60,7 @@ export const getContacts = (playoad: any, off: boolean = false) => {
 export const newConversation = (playoad: any, off: boolean = false) => {
   const socket = getSocket();
   if (!socket) {
-    console.log("Socket not connected");
+    // console.log("Socket not connected");
     return;
   }
 
@@ -79,7 +79,7 @@ export const newConversation = (playoad: any, off: boolean = false) => {
 export const getConversations = (playoad: any, off: boolean = false) => {
   const socket = getSocket();
   if (!socket) {
-    console.log("Socket not connected");
+    // console.log("Socket not connected");
     return;
   }
 
@@ -98,7 +98,7 @@ export const getConversations = (playoad: any, off: boolean = false) => {
 export const newMessage = (playoad: any, off: boolean = false) => {
   const socket = getSocket();
   if (!socket) {
-    console.log("Socket not connected");
+    // console.log("Socket not connected");
     return;
   }
 
@@ -117,7 +117,7 @@ export const newMessage = (playoad: any, off: boolean = false) => {
 export const getMessage = (playoad: any, off: boolean = false) => {
   const socket = getSocket();
   if (!socket) {
-    console.log("Socket not connected");
+    // console.log("Socket not connected");
     return;
   }
 

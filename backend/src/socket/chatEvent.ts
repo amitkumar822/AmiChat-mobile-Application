@@ -2,6 +2,7 @@ import { Server as SocketIOServer, Socket } from "socket.io";
 import Conversation from "../models/Conversation";
 import Message from "../models/Message";
 
+//chatEvent
 export function registerChatEvent(io: SocketIOServer, socket: Socket) {
   socket.on("getConversations", async () => {
     try {
