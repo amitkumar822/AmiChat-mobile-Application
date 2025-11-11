@@ -4,14 +4,14 @@ import { generateToken } from "../utils/token";
 
 export function registerUserEvents(_io: SocketIOServer, socket: Socket) {
   // when user connects, register events
-  socket.on("testSocket", (_data) => {
-    socket.emit("testSocket", { msg: "It's working" });
-  });
+  // socket.on("testSocket", (_data) => {
+  //   socket.emit("testSocket", { msg: "It's working" });
+  // });
 
   socket.on(
     "updateProfile",
     async (data: { name?: string; avatar?: string }) => {
-      console.log("data:====>", JSON.stringify(data, null, 2));
+      // console.log("data:====>", JSON.stringify(data, null, 2));
 
       const userId = socket.data.userId;
       if (!userId) {

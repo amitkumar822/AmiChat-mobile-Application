@@ -40,7 +40,7 @@ export function initializeSocket(server: any): SocketIOServer {
   // when socket connects, register events
   io.on("connection", async (socket: Socket) => {
     const userId = socket.data.userId;
-    console.log(`User connected:${userId} with socket id:${socket.id}`);
+    // console.log(`User connected:${userId} with socket id:${socket.id}`);
 
     // register events
     registerChatEvent(io, socket);
