@@ -1,11 +1,12 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import React from "react";
-import { colors, spacingY } from "@/constants/theme";
+import { colors, spacingX, spacingY, radius } from "@/constants/theme";
 import { ConversationListItemProps } from "@/types";
 import Avatar from "./Avatar";
 import moment from "moment";
 import Typo from "./Typo";
 import { useAuth } from "@/contexts/authContext";
+import * as Icons from "phosphor-react-native";
 
 const ConversationItem = ({
     item,
@@ -47,7 +48,67 @@ const ConversationItem = ({
     const getLastMessageContent = () => {
         if (!lastMessage) return "Say hi 👋";
 
-        return lastMessage?.attachement ? "Image" : lastMessage?.content;
+        const hasAttachment =
+            lastMessage?.attachment || (lastMessage as any)?.attachement;
+
+        return hasAttachment ? "Image" : lastMessage?.content;
+    };
+
+    const showTyping =
+        !!item.typingStatus?.isTyping &&
+        item.typingStatus.userId !== currentUser?.id;
+
+    const typingLabel = isDirect
+        ? "Typing..."
+        : `${item.typingStatus?.name ?? "Someone"} is typing...`;
+
+    const renderStatusIcon = () => {
+        if (showTyping || !lastMessage || !currentUser?.id) return null;
+        if (lastMessage.senderId !== currentUser.id) return null;
+
+        const otherParticipantIds = item.participants
+            .map((participant: any) => participant._id)
+            .filter((id: string) => id !== currentUser.id);
+
+        if (!otherParticipantIds.length) return null;
+
+        const delivered = otherParticipantIds.every((id: string) =>
+            (lastMessage.deliveredTo || []).includes(id)
+        );
+        const read = otherParticipantIds.every((id: string) =>
+            (lastMessage.readBy || []).includes(id)
+        );
+
+        if (read) {
+            return (
+                <Icons.Checks
+                    size={16}
+                    weight="bold"
+                    color="#2563eb"
+                    style={styles.statusIcon}
+                />
+            );
+        }
+
+        if (delivered) {
+            return (
+                <Icons.Checks
+                    size={16}
+                    weight="bold"
+                    color={colors.neutral600}
+                    style={styles.statusIcon}
+                />
+            );
+        }
+
+        return (
+            <Icons.Check
+                size={16}
+                weight="bold"
+                color={colors.neutral600}
+                style={styles.statusIcon}
+            />
+        );
     };
 
 
@@ -79,16 +140,47 @@ const ConversationItem = ({
                         <Typo size={17} fontWeight={"600"}>
                             {isDirect ? otherParticipant?.name : item?.name}
                         </Typo>
-                        {item?.lastMessage && <Typo size={15}>{getLastMessageDate()}</Typo>}
+                            <View style={styles.rightMeta}>
+                                {item?.lastMessage && !showTyping && (
+                                    <Typo size={15}>{getLastMessageDate()}</Typo>
+                                )}
+                                {item?.unreadCount ? (
+                                    <View style={styles.unreadBadge}>
+                                        <Typo
+                                            size={12}
+                                            fontWeight={"700"}
+                                            color={colors.white}
+                                        >
+                                            {item.unreadCount > 99
+                                                ? "99+"
+                                                : item.unreadCount}
+                                        </Typo>
+                                    </View>
+                                ) : null}
+                            </View>
                     </View>
 
-                    <Typo
-                        size={15}
-                        color={colors.neutral600}
-                        textProps={{ numberOfLines: 1 }}
-                    >
-                        {getLastMessageContent()}
-                    </Typo>
+                    <View style={styles.lastMessageRow}>
+                        {renderStatusIcon()}
+                        {showTyping ? (
+                            <Typo
+                                size={15}
+                                fontWeight={"600"}
+                                color={colors.primaryDark}
+                                textProps={{ numberOfLines: 1 }}
+                            >
+                                {typingLabel}
+                            </Typo>
+                        ) : (
+                            <Typo
+                                size={15}
+                                color={colors.neutral600}
+                                textProps={{ numberOfLines: 1 }}
+                            >
+                                {getLastMessageContent()}
+                            </Typo>
+                        )}
+                    </View>
                 </View>
             </TouchableOpacity>
 
@@ -111,10 +203,32 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-between",
     },
+    rightMeta: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: spacingX._7,
+    },
     divider: {
         height: 1,
         width: "95%",
         alignSelf: "center",
         backgroundColor: "rgba(0, 0, 0, 0.07)",
+    },
+    lastMessageRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 6,
+    },
+    statusIcon: {
+        marginTop: 2,
+    },
+    unreadBadge: {
+        backgroundColor: colors.primary,
+        borderRadius: radius.full,
+        minWidth: 24,
+        paddingHorizontal: spacingX._7,
+        paddingVertical: 2,
+        alignItems: "center",
+        justifyContent: "center",
     },
 });

@@ -112,6 +112,12 @@ export type ConversationProps = {
   _id: string;
   type: "direct" | "group";
   avatar: string | null;
+  unreadCount?: number;
+  typingStatus?: {
+    userId: string;
+    name: string;
+    isTyping: boolean;
+  };
   participants: {
     _id: string;
     name: string;
@@ -123,9 +129,11 @@ export type ConversationProps = {
     _id: string;
     content: string;
     senderId: string;
-    type: "text" | "image" | "file";
+    type?: "text" | "image" | "file";
     attachment?: string;
     createdAt: string;
+    deliveredTo?: string[];
+    readBy?: string[];
   };
   createdAt: string;
   updatedAt: string;
@@ -142,4 +150,7 @@ export type MessageProps = {
   attachment?: string | null;
   isMe?: boolean;
   createdAt: string;
+  conversationId?: string;
+  deliveredTo?: string[];
+  readBy?: string[];
 };

@@ -132,3 +132,81 @@ export const getMessage = (playoad: any, off: boolean = false) => {
     socket.emit("getMessage", playoad); // sending payload as data
   }
 };
+
+export const messageDelivered = (playoad: any, off: boolean = false) => {
+  const socket = getSocket();
+  if (!socket) {
+    return;
+  }
+
+  if (off) {
+    socket.off("messageDelivered", playoad);
+  } else if (typeof playoad === "function") {
+    socket.on("messageDelivered", playoad);
+  } else {
+    socket.emit("messageDelivered", playoad);
+  }
+};
+
+export const messageRead = (playoad: any, off: boolean = false) => {
+  const socket = getSocket();
+  if (!socket) {
+    return;
+  }
+
+  if (off) {
+    socket.off("messageRead", playoad);
+  } else if (typeof playoad === "function") {
+    socket.on("messageRead", playoad);
+  } else {
+    socket.emit("messageRead", playoad);
+  }
+};
+
+export const messageStatusUpdated = (
+  playoad: any,
+  off: boolean = false
+) => {
+  const socket = getSocket();
+  if (!socket) {
+    return;
+  }
+
+  if (off) {
+    socket.off("messageStatusUpdated", playoad);
+  } else if (typeof playoad === "function") {
+    socket.on("messageStatusUpdated", playoad);
+  } else {
+    socket.emit("messageStatusUpdated", playoad);
+  }
+};
+
+export const unreadCountUpdated = (playoad: any, off: boolean = false) => {
+  const socket = getSocket();
+  if (!socket) {
+    return;
+  }
+
+  if (off) {
+    socket.off("unreadCountUpdated", playoad);
+  } else if (typeof playoad === "function") {
+    socket.on("unreadCountUpdated", playoad);
+  } else {
+    socket.emit("unreadCountUpdated", playoad);
+  }
+};
+
+export const typing = (playoad: any, off: boolean = false) => {
+  const socket = getSocket();
+  if (!socket) {
+    return;
+  }
+
+  if (off) {
+    socket.off("typing", playoad);
+  } else if (typeof playoad === "function") {
+    socket.on("typing", playoad);
+  } else {
+    socket.emit("typing", playoad);
+  }
+};

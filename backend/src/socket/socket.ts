@@ -49,6 +49,9 @@ export function initializeSocket(server: any): SocketIOServer {
 
     // join all the conversations the use is part of
     try {
+      if (userId) {
+        socket.join(userId.toString());
+      }
       const conversations = await Conversation.find({
         participants: userId,
       }).select("_id");
